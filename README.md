@@ -36,24 +36,39 @@ This image is available online and is part of the public domain. Varying sizes w
 - Includes a **VIBGYOR quick palette** (Violet, Indigo, Blue, Green, Yellow, Orange, Red) for instant selection.
 
 ### 4. Clear all highlights
-- Click **“Clear All”** in the popup to remove *all* highlights from the current page and clear them from storage.
+- Click **"Clear All"** in the popup to remove *all* highlights from the current page and clear them from storage.
 - A small confirmation toggle prevents accidental mass clearing.
 
 ### 5. Keyboard shortcut (`Ctrl+Shift+H`)
 - Default shortcut: **Ctrl+Shift+H**
 - Works on Windows, Linux, and ChromeOS.  
   On macOS, you can manually bind **Command+Shift+H**.
-- This triggers “highlight or toggle highlight” without opening the popup.
+- This triggers "highlight or toggle highlight" without opening the popup.
 
 ---
 
 ## ⚙️ Installation
 
-1. Clone or download this repository.
-2. Open Chrome and navigate to `chrome://extensions/`
-3. Enable **Developer mode** (top right corner).
-4. Click **“Load unpacked”** and select the extension folder.
-5. The “Safe Persistent Highlighter” icon will appear in your toolbar.
+1.  Download and extract the recent release (the zipped folder) to your chosen folder.
+2.  Open Chrome or Brave and navigate to `chrome://extensions/`
+3.  Enable **Developer mode** using the toggle switch (found in the top right corner).
+
+### First-Time Installation or Major Updates
+4.  Click **"Load unpacked"** and select the extension folder.
+
+### Updating an Existing Version
+4.  **To Update (Recommended):** Click **"Remove"** on the old extension entry, then click **"Load unpacked"** and select the **new** extension folder. *(Note: You must remove the old version first, as Chrome prevents loading two extensions with the same ID.)*
+
+5.  The "Simple Highlighter" icon will appear in your toolbar.
+
+---
+
+### 🔧 Developer Tip for Quick Updates
+If you are updating an existing version and don't want to remove/re-add it:
+
+1.  Overwrite the old files in the original folder with the new files.
+2.  Go to `chrome://extensions/`.
+3.  Click the **"Reload"** button (the circular arrow icon) on the extension's card to instantly apply the changes.
 
 ---
 
@@ -134,8 +149,8 @@ This extension is built on a foundation of maximum transparency and minimal intr
 
 If `Ctrl+Shift+H` is already taken or blocked:
 1. Open `chrome://extensions/shortcuts`
-2. Find **“Safe Persistent Highlighter”**
-3. Set a custom shortcut for **“Highlight current selection with last-used color.”**
+2. Find **"Simple Highlighter"**
+3. Set a custom shortcut for **"Highlight current selection with last-used color."**
 4. You can set different bindings per OS (e.g., `Command+Shift+H` on macOS).
 
 ---
@@ -195,7 +210,7 @@ While the license grants you broad freedoms, I **humbly request** that you refra
 
 This request is purely ethical and is made to protect the spirit of this project as a tool focused on user privacy and freedom.
 
-### ⚠️ Important Note for Users
+### ⚠️ Note for Users
 
 Please be aware that while the original software is free of such practices, **forks or different versions of this software may include analytics or trackers**. It is the subsequent developer’s choice whether to implement these features. Therefore, we urge you to **always be vigilant and exercise caution** when using any modified or derivative versions of this extension.
 
