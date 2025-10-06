@@ -2,22 +2,40 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Highlighter (Hardened)</title>
+  <title>Safe Highlighter</title>
   <style>
-    body { width: 260px; font-family: Arial, sans-serif; padding: 10px; }
-    button { width: 100%; padding: 8px; margin: 6px 0; font-size: 14px; }
-    input[type="color"] { width: 100%; height: 36px; border: none; padding: 0; margin-bottom: 8px; }
-    #origin { font-size: 12px; color: #333; margin-bottom: 6px; word-break: break-all; }
-    #msg { font-size: 12px; color: red; min-height: 18px; }
+    body { width: 300px; font-family: system-ui, Arial, sans-serif; padding: 12px; }
+    .row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    input[type="color"] { width: 56px; height: 34px; padding: 0; border: none; background: none; }
+    button { padding: 8px 10px; font-size: 13px; cursor: pointer; }
+    #recents { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+    .swatch { width:28px; height:28px; border-radius:4px; border:1px solid #ccc; cursor:pointer; display:inline-block; box-shadow:0 0 0 1px rgba(0,0,0,0.02) inset; }
+    .vibgyor { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+    .origin { font-size:12px; color:#333; margin-bottom:6px; word-break:break-all; }
+    #msg { font-size:12px; min-height:18px; color:#d00; margin-top:8px; }
+    .small { font-size:12px; color:#666; }
   </style>
 </head>
 <body>
-  <div id="origin">Checking page…</div>
-  <input id="color" type="color" value="#fff176" title="Highlight color" />
-  <button id="highlight">Highlight selection</button>
-  <button id="clear">Clear highlights</button>
-  <div id="msg"></div>
+  <div class="origin" id="origin">Checking page…</div>
 
+  <div class="row">
+    <input id="color" type="color" value="#fff176" title="Highlight color" />
+    <div style="flex:1;">
+      <button id="highlight">Highlight (Shift+H)</button>
+      <button id="clear" style="margin-left:6px;">Clear highlights</button>
+    </div>
+  </div>
+
+  <div class="small">Recent colors:</div>
+  <div id="recents"></div>
+
+  <div class="small" style="margin-top:8px;">Quick palette:</div>
+  <div class="vibgyor" id="vibgyor">
+    <!-- vibgyor tiles injected by JS -->
+  </div>
+
+  <div id="msg"></div>
   <script src="popup.js"></script>
 </body>
 </html>

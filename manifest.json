@@ -1,11 +1,32 @@
 {
   "manifest_version": 3,
   "name": "Simple Highlighter",
-  "version": "1.1",
-  "description": "Highlight selected text.",
-  "permissions": ["scripting", "activeTab"],
+  "version": "1.2",
+  "description": "Highlight text, persist highlights across reloads, keyboard shortcut (Shift+H), vibgyor palette, recents. Hardened for safety.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_title": "Simple Highlighter"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content-script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "_execute_action": {
+        "suggested_key": { "default": "Alt+H" },
+        "description": "Open extension (built-in)"
+    },
+    "highlight-selection": {
+        "suggested_key": { "default": "Ctrl+Shift+H" },
+        "description": "Highlight current selection with last-used color"
+    }
   }
 }
