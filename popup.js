@@ -10,7 +10,7 @@ const vibgyorContainer = document.getElementById('vibgyor');
 const PREF_KEY = 'highlighter_prefs_v1';
 const MAX_RECENTS = 5;
 const DEFAULT_COLOR = '#fff176';
-const VIBGYOR = ['#ff1744', '#ff9100', '#ffd600', '#a7e8c8', '#76ff03', '#00e5ff', '#2979ff', '#d500f9', '#9e9e9e', '#ffffff'];
+const VIBGYOR = ['#ff1744', '#ffb8ec', '#ff9100', '#ffd600', '#a7e8c8', '#76ff03', '#00e5ff', '#2979ff', '#d500f9', '#757372'];
 
 // ---------- utilities ----------
 function showMsg(text, isError = true) {
@@ -183,7 +183,7 @@ document.getElementById('highlight').addEventListener('click', async () => {
 
 document.getElementById('clear').addEventListener('click', async () => {
   // confirm intent
-  const confirmed = confirm('Clear ALL highlights on this page? This will remove every saved highlight for this page.');
+  const confirmed = confirm('Confirm clearing all highlights on this page? This action is irreversible.');
   if (!confirmed) return;
 
   const res = await sendMessageToActiveTab({ action: 'clearAll' });
@@ -191,7 +191,7 @@ document.getElementById('clear').addEventListener('click', async () => {
     showMsg('All highlights cleared', false);
     // also update UI recents/prefs if desired (we keep recents)
   } else {
-    showMsg('Clear failed.');
+    showMsg('Clear failed. Reload the page.');
   }
 });
 
