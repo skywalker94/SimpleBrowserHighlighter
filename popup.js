@@ -1,4 +1,5 @@
-// popup.js - Hardened + persisted lastColor; recents updated ONLY when highlight is applied
+// popup.js - Persisted lastColor; recents only updated on applied highlights.
+// Uses messaging to the content script for highlight / clearAll actions.
 
 const originEl = document.getElementById('origin');
 const msgEl = document.getElementById('msg');
@@ -16,7 +17,7 @@ function showMsg(text, isError = true) {
   if (!msgEl) return;
   msgEl.textContent = text || '';
   msgEl.style.color = isError ? 'red' : 'green';
-  if (text) setTimeout(() => { msgEl.textContent = ''; }, 4000);
+  if (text) setTimeout(() => { msgEl.textContent = ''; }, 3500);
 }
 
 function isValidHexColor(c) {
@@ -120,6 +121,7 @@ function renderVibgyor() {
   });
 }
 
+
 // ---------- active tab helpers ----------
 async function showActiveTabInfo() {
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -138,75 +140,26 @@ async function showActiveTabInfo() {
   }
 }
 
-async function runOnActiveTab(func, args = []) {
-  const tabInfo = await showActiveTabInfo();
-  if (!tabInfo) return;
-  // Only allow http(s) pages to run
-  if (!tabInfo.url.startsWith('http://') && !tabInfo.url.startsWith('https://')) {
-    showMsg('Extension runs only on regular web pages (http/https).');
-    return;
+// send a message to content script on active tab
+async function sendMessageToActiveTab(message) {
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (!tabs || !tabs[0]) return { ok: false, err: 'no_tab' };
+  const tab = tabs[0];
+
+  if (!tab.url || (!tab.url.startsWith('http://') && !tab.url.startsWith('https://'))) {
+    return { ok: false, err: 'bad_scheme' };
   }
 
-  try {
-    const result = await chrome.scripting.executeScript({
-      target: { tabId: tabInfo.tabId },
-      func: func,
-      args: args
+  return new Promise((resolve) => {
+    chrome.tabs.sendMessage(tab.id, message, (resp) => {
+      if (chrome.runtime.lastError) {
+        resolve({ ok: false, err: 'no_listener', message: chrome.runtime.lastError.message });
+      } else resolve(resp || { ok: false, err: 'no_resp' });
     });
-    return result;
-  } catch (e) {
-    console.error('script inject failed', e);
-    showMsg('Could not run on this page.');
-  }
+  });
 }
 
-// ---------- injected helper functions (unsafe-to-page logic is safe) ----------
-function injectedHighlightFunction(highlightColor) {
-  const isHex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
-  if (!isHex.test(highlightColor)) return { ok: false, err: 'invalid_color' };
-
-  const sel = window.getSelection();
-  if (!sel || sel.isCollapsed) return { ok: false, err: 'no_selection' };
-
-  try {
-    const text = sel.toString();
-    if (!text) return { ok: false, err: 'empty_text' };
-
-    const span = document.createElement('span');
-    span.className = '__simple_ext_highlight_safe';
-    span.textContent = text;
-    span.style.backgroundColor = highlightColor;
-    span.style.borderRadius = '2px';
-    span.setAttribute('data-ext-origin', location.origin || '');
-
-    const range = sel.getRangeAt(0).cloneRange();
-    range.deleteContents();
-    range.insertNode(span);
-
-    sel.removeAllRanges();
-    return { ok: true };
-  } catch (e) {
-    return { ok: false, err: 'exception', message: String(e) };
-  }
-}
-
-function injectedClearHighlightsFunction() {
-  try {
-    const list = document.querySelectorAll('span.__simple_ext_highlight_safe');
-    list.forEach(span => {
-      const parent = span.parentNode;
-      if (!parent) return;
-      parent.insertBefore(document.createTextNode(span.textContent), span);
-      parent.removeChild(span);
-      parent.normalize();
-    });
-    return { ok: true };
-  } catch (e) {
-    return { ok: false, err: 'exception', message: String(e) };
-  }
-}
-
-// ---------- event handlers ----------
+// ---------- event handlers (use messaging so content script handles logic & persistence) ----------
 document.getElementById('highlight').addEventListener('click', async () => {
   const color = colorInput.value || DEFAULT_COLOR;
   if (!isValidHexColor(color)) {
@@ -214,28 +167,29 @@ document.getElementById('highlight').addEventListener('click', async () => {
     return;
   }
 
-  const res = await runOnActiveTab(injectedHighlightFunction, [color]);
-  if (!res || !res[0] || !res[0].result) {
-    showMsg('Failed to highlight on page.');
-    return;
-  }
-  const resultObj = res[0].result;
-  if (!resultObj.ok) {
-    if (resultObj.err === 'no_selection') showMsg('Please select text on the page first.');
-    else if (resultObj.err === 'invalid_color') showMsg('Invalid color.');
-    else showMsg('Highlight failed.');
+  const res = await sendMessageToActiveTab({ action: 'highlight', color });
+  if (!res || !res.ok) {
+    // handle known error cases
+    if (res && res.err === 'no_selection') showMsg('Please select text on the page first.');
+    else if (res && res.err === 'invalid_color') showMsg('Invalid color.');
+    else showMsg('Highlight failed (page may block messages).');
     return;
   }
 
-  // success: add to recents (only now)
+  // success: add to recents
   await addToRecents(color);
   showMsg('Highlighted ✓', false);
 });
 
 document.getElementById('clear').addEventListener('click', async () => {
-  const res = await runOnActiveTab(injectedClearHighlightsFunction, []);
-  if (res && res[0] && res[0].result && res[0].result.ok) {
-    showMsg('Cleared highlights', false);
+  // confirm intent
+  const confirmed = confirm('Clear ALL highlights on this page? This will remove every saved highlight for this page.');
+  if (!confirmed) return;
+
+  const res = await sendMessageToActiveTab({ action: 'clearAll' });
+  if (res && res.ok) {
+    showMsg('All highlights cleared', false);
+    // also update UI recents/prefs if desired (we keep recents)
   } else {
     showMsg('Clear failed.');
   }
