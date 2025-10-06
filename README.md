@@ -210,7 +210,7 @@ While the license grants you broad freedoms, I **humbly request** that you refra
 
 This request is purely ethical and is made to protect the spirit of this project as a tool focused on user privacy and freedom.
 
-### ⚠️ Important Note for Users
+### ⚠️ Note for Users
 
 Please be aware that while the original software is free of such practices, **forks or different versions of this software may include analytics or trackers**. It is the subsequent developer’s choice whether to implement these features. Therefore, we urge you to **always be vigilant and exercise caution** when using any modified or derivative versions of this extension.
 
