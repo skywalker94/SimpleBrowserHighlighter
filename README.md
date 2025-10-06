@@ -1,35 +1,49 @@
-# 🖍️ Safe Persistent Highlighter (Chrome Extension)
+# 🖍️ Simple Highlighter (Chrome Extension)
 
-A privacy-friendly Chrome extension that lets you **highlight text**, **persist highlights across page reloads**, and **quickly highlight via keyboard shortcut (`Ctrl+Shift+H`)**.  
-It remembers your **last-used color**, offers **recent colors**, and includes a **VIBGYOR color palette** for quick access — all while being **secure and sandboxed** (no external scripts, no data collection).
+A privacy-friendly Chrome extension that lets you **highlight text**, **persist highlights across page reloads**, and **quickly highlight via keyboard shortcut (`Ctrl+Shift+H`)**.
+
+It remembers your **last-used color**, supports and stores **recently used colors**, and includes a **VIBGYOR-y color palette** for quick access — all while being **secure and sandboxed** (no external scripts, no data collection).
+
+---
+
+## 📸 Extension Image
+
+![Simple Highlighter Logo](images/logo_128.png)
+
+This image is available online and is part of the public domain. Varying sizes were generated from original 128-pixel [Public Domain Source](https://icon-icons.com/icon/highlighter-yellow/14331).
 
 ---
 
 ## ✨ Features
 
-### 1. Highlight selected text
+### 1. Smart highlighting
 - Select any text on a web page.
-- Open the popup (via toolbar icon) or press **`Ctrl+Shift+H`** to highlight instantly with your last-used color.
-- Highlights are inserted safely as `<span>` elements with inline background color.
+- Use the popup (toolbar icon) or **Ctrl+Shift+H** to instantly highlight it with your last-used color.
+- The highlighter now supports **smart toggling**:
+  - If your selection is *not highlighted*, it gets highlighted.
+  - If your selection is *partially highlighted*, it merges and expands the highlight.
+  - If your selection is *fully highlighted*, pressing the shortcut again removes the highlight.
+- Highlights are safely inserted as `<span>` elements with inline background color — no HTML injection.
 
 ### 2. Persistent highlights
-- Highlights are automatically saved in Chrome’s `chrome.storage.local`.
-- When you reload or revisit the same page (same URL), your highlights are restored.
-- Stored data is local to your browser — never leaves your device.
+- Highlights automatically persist in Chrome’s local storage.
+- When you reload or revisit the same page, your highlights are restored.
+- Storage is fully local (never synced or uploaded).
 
 ### 3. Color memory and palette
-- Your **last used color** is saved automatically.
-- A **recents bar** (up to 5 recent colors) appears below the color picker.
-- A set of **VIBGYOR color tiles** (Violet, Indigo, Blue, Green, Yellow, Orange, Red) gives you one-click quick choices.
+- Your **last used color** is remembered automatically.
+- A **recents bar** shows up to 5 colors you actually *used to highlight text* (not just previewed).
+- Includes a **VIBGYOR quick palette** (Violet, Indigo, Blue, Green, Yellow, Orange, Red) for instant selection.
 
-### 4. Clear highlights
-- Click **“Clear highlights”** in the popup to remove all highlights from the current page and clear them from storage.
+### 4. Clear all highlights
+- Click **“Clear All”** in the popup to remove *all* highlights from the current page and clear them from storage.
+- A small confirmation toggle prevents accidental mass clearing.
 
 ### 5. Keyboard shortcut (`Ctrl+Shift+H`)
 - Default shortcut: **Ctrl+Shift+H**
 - Works on Windows, Linux, and ChromeOS.  
-  On macOS, you can manually set it to **Command+Shift+H**.
-- This runs the “highlight last selection” action without needing the popup.
+  On macOS, you can manually bind **Command+Shift+H**.
+- This triggers “highlight or toggle highlight” without opening the popup.
 
 ---
 
@@ -49,22 +63,25 @@ It remembers your **last-used color**, offers **recent colors**, and includes a 
 1. Select text on any regular webpage (HTTP/HTTPS only).
 2. Click the extension icon.
 3. Pick a color or one of the VIBGYOR tiles.
-4. Click **“Highlight selection”** — your selection is highlighted and stored.
-5. To remove highlights, click **“Clear highlights.”**
+4. Click **"Mark"** — the selection is highlighted and saved.
+5. To remove all highlights, click **"Clear All"** and confirm.
 
 **Using the keyboard shortcut:**
 1. Select text.
 2. Press **`Ctrl+Shift+H`** (or `Command+Shift+H` on Mac if configured).
-3. The selected text is highlighted instantly with your last-used color.
-
+3. If the text is unhighlighted, it becomes highlighted.  
+   If it’s already fully highlighted, it’s removed.  
+   If it’s partially highlighted, the highlight is expanded or merged.
 ---
 
 ## 🧠 Persistence Details
 
-Highlights are stored per-URL in `chrome.storage.local` as an array of simple range and text data (not raw HTML).  
-On page load, the **content script** (`content-script.js`) reads the saved ranges and reapplies highlights safely.
+Highlights are stored per-URL in `chrome.storage.local` as a safe, minimal JSON array (text and color).  
+The **content script** restores all highlights automatically when the page is reloaded.
 
-The stored format avoids any injection or unsafe re-insertion of HTML, and the highlight spans are always inserted in the **extension’s isolated world** for security.
+When a highlight is removed (either manually or via toggle), it is immediately deleted from storage — keeping your data clean and consistent.
+
+All operations (add, remove, clear all) are handled **safely and asynchronously**, with no direct HTML re-insertion or unsafe DOM operations.
 
 ---
 
@@ -128,11 +145,16 @@ If `Ctrl+Shift+H` is already taken or blocked:
 | File | Purpose |
 |------|----------|
 | `manifest.json` | Chrome extension manifest (permissions, commands, scripts, etc.) |
-| `popup.html` | The popup UI (color picker, recents, vibgyor tiles, buttons). |
-| `popup.js` | Handles popup logic, color selection, and calls highlighting scripts. |
-| `content-script.js` | Runs in the webpage, restores highlights on load, and applies new ones. |
-| `service-worker.js` | Background worker that listens for keyboard shortcuts (`Ctrl+Shift+H`) and triggers highlighting. |
+| `popup.html` | The popup UI (color picker, recents, quick palette, buttons). |
+| `popup.js` |  Manages color selection, highlight calls, and user confirmation for 'Clear All.' |
+| `content-script.js` | Applies and removes highlights, restores them on page load, and handles smart toggling. |
+| `service-worker.js` | Background script that listens for keyboard shortcuts (`Ctrl+Shift+H`) and triggers highlighting. |
 | `README.md` | This documentation file. |
+| `images/logo_32.png` | 32px logo image file. |
+| `images/logo_48.png` | 48px logo image file. |
+| `images/logo_64.png` | 64px logo image file. |
+| `images/logo_96.png` | 96px logo image file. |
+| `images/logo_128.png` | 128px logo image file. |
 
 ---
 
