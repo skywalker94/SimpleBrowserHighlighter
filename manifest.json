@@ -8,9 +8,19 @@
   "background": {
     "service_worker": "service-worker.js"
   },
+  "icons": {
+    "64": "images/logo_64.png",
+    "96": "images/logo_96.png",
+    "128": "images/logo_128.png"
+  },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Simple Highlighter"
+    "default_title": "Simple Highlighter",
+    "default_icon": {
+        "32": "images/logo_32.png",
+        "48": "images/logo_48.png",
+        "64": "images/logo_64.png"
+    }
   },
   "content_scripts": [
     {
