@@ -1,34 +1,139 @@
-// popup.js - Hardened version
+// popup.js - Hardened + persisted color / recents + vibgyor palette
 
 const originEl = document.getElementById('origin');
 const msgEl = document.getElementById('msg');
+const colorInput = document.getElementById('color');
+const recentsContainer = document.getElementById('recents');
+const vibgyorContainer = document.getElementById('vibgyor');
 
+const PREF_KEY = 'highlighter_prefs_v1';
+const MAX_RECENTS = 5;
+const DEFAULT_COLOR = '#fff176';
+const VIBGYOR = ['#ff1744','#ff9100','#ffd600','#76ff03','#00e5ff','#2979ff','#d500f9'];
+
+// ---------- utilities ----------
 function showMsg(text, isError = true) {
+  if (!msgEl) return;
   msgEl.textContent = text || '';
   msgEl.style.color = isError ? 'red' : 'green';
   if (text) setTimeout(() => { msgEl.textContent = ''; }, 4000);
 }
 
-// Strict hex color validator (#RGB or #RRGGBB)
 function isValidHexColor(c) {
   return /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(c);
 }
 
-// Display active tab origin
+function storageGet(key) {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(key, (obj) => {
+      resolve(obj[key]);
+    });
+  });
+}
+function storageSet(obj) {
+  return new Promise((resolve) => {
+    chrome.storage.local.set(obj, () => resolve());
+  });
+}
+
+// ---------- prefs (load/save) ----------
+async function loadPrefs() {
+  const data = await storageGet(PREF_KEY);
+  if (!data) return { lastColor: DEFAULT_COLOR, recents: [] };
+  const lastColor = isValidHexColor(data.lastColor) ? data.lastColor : DEFAULT_COLOR;
+  const recents = Array.isArray(data.recents) ? data.recents.filter(c => isValidHexColor(c)).slice(0, MAX_RECENTS) : [];
+  return { lastColor, recents };
+}
+
+async function savePrefs(prefs) {
+  const payload = {};
+  payload[PREF_KEY] = {
+    lastColor: prefs.lastColor,
+    recents: (prefs.recents || []).slice(0, MAX_RECENTS)
+  };
+  await storageSet(payload);
+}
+
+// add color to recents & set lastColor
+async function addToRecents(color) {
+  if (!isValidHexColor(color)) return;
+  const prefs = await loadPrefs();
+  prefs.lastColor = color;
+  prefs.recents = prefs.recents || [];
+  prefs.recents = [color, ...prefs.recents.filter(c => c.toLowerCase() !== color.toLowerCase())].slice(0, MAX_RECENTS);
+  await savePrefs(prefs);
+  renderRecents(prefs.recents);
+}
+
+// update last color without duplicating recents logic (keeps it in front)
+async function updateLastColor(color) {
+  if (!isValidHexColor(color)) return;
+  const prefs = await loadPrefs();
+  prefs.lastColor = color;
+  prefs.recents = prefs.recents || [];
+  prefs.recents = [color, ...prefs.recents.filter(c => c.toLowerCase() !== color.toLowerCase())].slice(0, MAX_RECENTS);
+  await savePrefs(prefs);
+  renderRecents(prefs.recents);
+}
+
+// ---------- UI renderers ----------
+function renderRecents(recents) {
+  if (!recentsContainer) return;
+  recentsContainer.innerHTML = '';
+  if (!recents || !recents.length) return;
+  recents.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'swatch';
+    d.style.backgroundColor = c;
+    d.title = c;
+    d.style.width = '28px';
+    d.style.height = '28px';
+    d.style.borderRadius = '4px';
+    d.style.border = '1px solid #ccc';
+    d.style.cursor = 'pointer';
+    d.addEventListener('click', async () => {
+      colorInput.value = c;
+      await updateLastColor(c);
+    });
+    recentsContainer.appendChild(d);
+  });
+}
+
+function renderVibgyor() {
+  if (!vibgyorContainer) return;
+  vibgyorContainer.innerHTML = '';
+  VIBGYOR.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'swatch';
+    d.style.backgroundColor = c;
+    d.title = c;
+    d.style.width = '28px';
+    d.style.height = '28px';
+    d.style.borderRadius = '4px';
+    d.style.border = '1px solid #ccc';
+    d.style.cursor = 'pointer';
+    d.addEventListener('click', async () => {
+      colorInput.value = c;
+      await updateLastColor(c);
+    });
+    vibgyorContainer.appendChild(d);
+  });
+}
+
+// ---------- active tab helpers ----------
 async function showActiveTabInfo() {
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tabs || !tabs[0]) {
-    originEl.textContent = 'No active tab';
+    if (originEl) originEl.textContent = 'No active tab';
     return null;
   }
   const url = tabs[0].url || '';
   try {
     const u = new URL(url);
-    originEl.textContent = u.origin;
+    if (originEl) originEl.textContent = u.origin;
     return { tabId: tabs[0].id, origin: u.origin, url: url };
   } catch (e) {
-    // non-http(s) schemes
-    originEl.textContent = url || 'Unknown';
+    if (originEl) originEl.textContent = url || 'Unknown';
     return { tabId: tabs[0].id, origin: null, url: url };
   }
 }
@@ -55,36 +160,25 @@ async function runOnActiveTab(func, args = []) {
   }
 }
 
-// Injected function: uses ONLY plain text to avoid re-inserting HTML/scripts
+// ---------- injected helper functions (same safe ones) ----------
 function injectedHighlightFunction(highlightColor) {
-  // sanitize color again inside injected func (defense in depth)
   const isHex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
-  if (!isHex.test(highlightColor)) {
-    // don't use alert(); return status to popup
-    return { ok: false, err: 'invalid_color' };
-  }
+  if (!isHex.test(highlightColor)) return { ok: false, err: 'invalid_color' };
 
   const sel = window.getSelection();
-  if (!sel || sel.isCollapsed) {
-    return { ok: false, err: 'no_selection' };
-  }
+  if (!sel || sel.isCollapsed) return { ok: false, err: 'no_selection' };
 
   try {
-    // Use the selection's plain text only — escape any HTML/scripts
     const text = sel.toString();
     if (!text) return { ok: false, err: 'empty_text' };
 
     const span = document.createElement('span');
     span.className = '__simple_ext_highlight_safe';
-    // use textContent so any markup is escaped
     span.textContent = text;
-    // inline style only for background color (we already validated format)
     span.style.backgroundColor = highlightColor;
     span.style.borderRadius = '2px';
     span.setAttribute('data-ext-origin', location.origin || '');
 
-    // Replace the selection with a text node in the span.
-    // We will collapse the range and insert the span at the range start.
     const range = sel.getRangeAt(0).cloneRange();
     range.deleteContents();
     range.insertNode(span);
@@ -92,19 +186,16 @@ function injectedHighlightFunction(highlightColor) {
     sel.removeAllRanges();
     return { ok: true };
   } catch (e) {
-    // swallow errors and return status to popup
     return { ok: false, err: 'exception', message: String(e) };
   }
 }
 
-// Injected function to clear highlights safely
 function injectedClearHighlightsFunction() {
   try {
     const list = document.querySelectorAll('span.__simple_ext_highlight_safe');
     list.forEach(span => {
       const parent = span.parentNode;
       if (!parent) return;
-      // replace span with its text content (safe)
       parent.insertBefore(document.createTextNode(span.textContent), span);
       parent.removeChild(span);
       parent.normalize();
@@ -115,9 +206,9 @@ function injectedClearHighlightsFunction() {
   }
 }
 
-// Event handlers
+// ---------- event handlers ----------
 document.getElementById('highlight').addEventListener('click', async () => {
-  const color = document.getElementById('color').value || '#ffff00';
+  const color = colorInput.value || DEFAULT_COLOR;
   if (!isValidHexColor(color)) {
     showMsg('Selected color is invalid.');
     return;
@@ -135,6 +226,9 @@ document.getElementById('highlight').addEventListener('click', async () => {
     else showMsg('Highlight failed.');
     return;
   }
+
+  // success: add to recents
+  await addToRecents(color);
   showMsg('Highlighted ✓', false);
 });
 
@@ -147,5 +241,23 @@ document.getElementById('clear').addEventListener('click', async () => {
   }
 });
 
-// show origin on load
-showActiveTabInfo();
+// when user changes color in picker, update prefs immediately
+colorInput.addEventListener('input', async () => {
+  const c = colorInput.value;
+  if (isValidHexColor(c)) await updateLastColor(c);
+});
+
+// ---------- init ----------
+(async function init() {
+  // show origin
+  showActiveTabInfo();
+
+  // load prefs and set UI
+  const prefs = await loadPrefs();
+  if (colorInput) colorInput.value = prefs.lastColor || DEFAULT_COLOR;
+  renderRecents(prefs.recents || []);
+  renderVibgyor();
+
+  // small UX: when popup opens, also request latest tab origin again (some pages load slowly)
+  setTimeout(showActiveTabInfo, 250);
+})();

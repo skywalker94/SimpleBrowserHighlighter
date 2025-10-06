@@ -4,16 +4,83 @@
   <meta charset="utf-8" />
   <title>Safe Highlighter</title>
   <style>
-    body { width: 300px; font-family: system-ui, Arial, sans-serif; padding: 12px; }
-    .row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
-    input[type="color"] { width: 56px; height: 34px; padding: 0; border: none; background: none; }
-    button { padding: 8px 10px; font-size: 13px; cursor: pointer; }
-    #recents { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
-    .swatch { width:28px; height:28px; border-radius:4px; border:1px solid #ccc; cursor:pointer; display:inline-block; box-shadow:0 0 0 1px rgba(0,0,0,0.02) inset; }
-    .vibgyor { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
-    .origin { font-size:12px; color:#333; margin-bottom:6px; word-break:break-all; }
-    #msg { font-size:12px; min-height:18px; color:#d00; margin-top:8px; }
-    .small { font-size:12px; color:#666; }
+    body {
+      font-family: sans-serif;
+      margin: 10px;
+      max-width: 300px;
+      background: #fafafa;
+    }
+    .origin {
+      font-size: 12px;
+      color: #333;
+      margin-bottom: 6px;
+      word-break: break-all;
+    }
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    input[type="color"] {
+      width: 56px;
+      height: 34px;
+      padding: 0;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+    button {
+      padding: 7px 9px;
+      font-size: 13px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background-color: #f2f2f2;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #e2e2e2;
+    }
+    #recents,
+    #vibgyor {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+    .swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      display: inline-block;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.02) inset;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .swatch:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 3px rgba(0, 0, 0, 0.25);
+    }
+    .small {
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+      margin-bottom: 2px;
+    }
+    #msg {
+      font-size: 12px;
+      min-height: 18px;
+      margin-top: 10px;
+      color: #d00;
+    }
+    .footer-tip {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #777;
+      line-height: 1.4;
+    }
   </style>
 </head>
 <body>
@@ -21,21 +88,27 @@
 
   <div class="row">
     <input id="color" type="color" value="#fff176" title="Highlight color" />
-    <div style="flex:1;">
-      <button id="highlight">Highlight (Shift+H)</button>
-      <button id="clear" style="margin-left:6px;">Clear highlights</button>
+    <div style="flex: 1;">
+      <button id="highlight" title="Highlight selected text">Highlight (Ctrl+Shift+H)</button>
+      <button id="clear" style="margin-left:6px;" title="Remove all highlights">Clear</button>
     </div>
   </div>
 
   <div class="small">Recent colors:</div>
   <div id="recents"></div>
 
-  <div class="small" style="margin-top:8px;">Quick palette:</div>
-  <div class="vibgyor" id="vibgyor">
-    <!-- vibgyor tiles injected by JS -->
+  <div class="small">Quick palette:</div>
+  <div id="vibgyor">
+    <!-- Vibgyor swatches injected by JS -->
   </div>
 
   <div id="msg"></div>
+
+  <div class="footer-tip">
+    💡 Tip: If <b>Ctrl+Shift+H</b> doesn’t work, open
+    <code>chrome://extensions/shortcuts</code> and assign a shortcut manually.
+  </div>
+
   <script src="popup.js"></script>
 </body>
 </html>
