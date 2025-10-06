@@ -36,14 +36,14 @@ This image is available online and is part of the public domain. Varying sizes w
 - Includes a **VIBGYOR quick palette** (Violet, Indigo, Blue, Green, Yellow, Orange, Red) for instant selection.
 
 ### 4. Clear all highlights
-- Click **“Clear All”** in the popup to remove *all* highlights from the current page and clear them from storage.
+- Click **"Clear All"** in the popup to remove *all* highlights from the current page and clear them from storage.
 - A small confirmation toggle prevents accidental mass clearing.
 
 ### 5. Keyboard shortcut (`Ctrl+Shift+H`)
 - Default shortcut: **Ctrl+Shift+H**
 - Works on Windows, Linux, and ChromeOS.  
   On macOS, you can manually bind **Command+Shift+H**.
-- This triggers “highlight or toggle highlight” without opening the popup.
+- This triggers "highlight or toggle highlight" without opening the popup.
 
 ---
 
@@ -54,12 +54,12 @@ This image is available online and is part of the public domain. Varying sizes w
 3.  Enable **Developer mode** using the toggle switch (found in the top right corner).
 
 ### First-Time Installation or Major Updates
-4.  Click **“Load unpacked”** and select the extension folder.
+4.  Click **"Load unpacked"** and select the extension folder.
 
 ### Updating an Existing Version
-4.  **To Update (Recommended):** Click **“Remove”** on the old extension entry, then click **“Load unpacked”** and select the **new** extension folder. *(Note: You must remove the old version first, as Chrome prevents loading two extensions with the same ID.)*
+4.  **To Update (Recommended):** Click **"Remove"** on the old extension entry, then click **"Load unpacked"** and select the **new** extension folder. *(Note: You must remove the old version first, as Chrome prevents loading two extensions with the same ID.)*
 
-5.  The “Simple Highlighter” icon will appear in your toolbar.
+5.  The "Simple Highlighter" icon will appear in your toolbar.
 
 ---
 
@@ -149,8 +149,8 @@ This extension is built on a foundation of maximum transparency and minimal intr
 
 If `Ctrl+Shift+H` is already taken or blocked:
 1. Open `chrome://extensions/shortcuts`
-2. Find **“Simple Highlighter”**
-3. Set a custom shortcut for **“Highlight current selection with last-used color.”**
+2. Find **"Simple Highlighter"**
+3. Set a custom shortcut for **"Highlight current selection with last-used color."**
 4. You can set different bindings per OS (e.g., `Command+Shift+H` on macOS).
 
 ---
