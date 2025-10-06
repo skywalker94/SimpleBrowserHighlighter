@@ -69,7 +69,6 @@
       color: #666;
       margin-top: 8px;
       margin-bottom: 2px;
-      text-align:center;
     }
     #msg {
       font-size: 12px;
@@ -86,13 +85,14 @@
   </style>
 </head>
 <body>
+  <div class="small">🟢 Active on domain:</div>
   <div class="origin" id="origin">Checking page…</div>
-
+  <hr>
   <div class="row">
     <input id="color" type="color" value="#fff176" title="Highlight color" />
     <div style="flex: 1;">
-      <button id="highlight" title="Highlight selected text">Highlight</button>
-      <button id="clear" style="margin-left:6px;" title="Remove all highlights">Clear</button>
+      <button id="highlight" title="Highlight selected text">Mark</button>
+      <button id="clear" style="margin-left:6px;" title="Remove all highlights on this page">Clear All</button>
     </div>
   </div>
 
