@@ -10,7 +10,7 @@ const vibgyorContainer = document.getElementById('vibgyor');
 const PREF_KEY = 'highlighter_prefs_v1';
 const MAX_RECENTS = 5;
 const DEFAULT_COLOR = '#fff176';
-const VIBGYOR = ['#ff1744','#ff9100','#ffd600','#76ff03','#00e5ff','#2979ff','#d500f9'];
+const VIBGYOR = ['#ff1744', '#ff9100', '#ffd600', '#a7e8c8', '#76ff03', '#00e5ff', '#2979ff', '#d500f9', '#9e9e9e', '#ffffff'];
 
 // ---------- utilities ----------
 function showMsg(text, isError = true) {

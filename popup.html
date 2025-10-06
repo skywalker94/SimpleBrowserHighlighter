@@ -2,12 +2,13 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Safe Highlighter</title>
+  <title>Simple Highlighter</title>
   <style>
     body {
       font-family: sans-serif;
       margin: 10px;
       max-width: 300px;
+      min-width: 200px;
       background: #fafafa;
     }
     .origin {
@@ -68,6 +69,7 @@
       color: #666;
       margin-top: 8px;
       margin-bottom: 2px;
+      text-align:center;
     }
     #msg {
       font-size: 12px;
@@ -76,7 +78,7 @@
       color: #d00;
     }
     .footer-tip {
-      margin-top: 10px;
+      margin-top: 2px;
       font-size: 11px;
       color: #777;
       line-height: 1.4;
@@ -85,11 +87,12 @@
 </head>
 <body>
   <div class="origin" id="origin">Checking page…</div>
+  <div class="origin" id="origin">Checking page…</div>
 
   <div class="row">
     <input id="color" type="color" value="#fff176" title="Highlight color" />
     <div style="flex: 1;">
-      <button id="highlight" title="Highlight selected text">Highlight (Ctrl+Shift+H)</button>
+      <button id="highlight" title="Highlight selected text">Highlight</button>
       <button id="clear" style="margin-left:6px;" title="Remove all highlights">Clear</button>
     </div>
   </div>
@@ -105,7 +108,7 @@
   <div id="msg"></div>
 
   <div class="footer-tip">
-    💡 Tip: If <b>Ctrl+Shift+H</b> doesn’t work, open
+    💡 Shortcut: <b>Ctrl+Shift+H</b>.<br>If this does not work, open
     <code>chrome://extensions/shortcuts</code> and assign a shortcut manually.
   </div>
 
