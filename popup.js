@@ -1,4 +1,4 @@
-// popup.js - Hardened + persisted color / recents + vibgyor palette
+// popup.js - Hardened + persisted lastColor; recents updated ONLY when highlight is applied
 
 const originEl = document.getElementById('origin');
 const msgEl = document.getElementById('msg');
@@ -54,26 +54,24 @@ async function savePrefs(prefs) {
   await storageSet(payload);
 }
 
-// add color to recents & set lastColor
+// add color to recents (called only after a highlight is applied)
 async function addToRecents(color) {
   if (!isValidHexColor(color)) return;
   const prefs = await loadPrefs();
-  prefs.lastColor = color;
+  prefs.lastColor = color; // keep lastColor in sync
   prefs.recents = prefs.recents || [];
   prefs.recents = [color, ...prefs.recents.filter(c => c.toLowerCase() !== color.toLowerCase())].slice(0, MAX_RECENTS);
   await savePrefs(prefs);
   renderRecents(prefs.recents);
 }
 
-// update last color without duplicating recents logic (keeps it in front)
-async function updateLastColor(color) {
+// set lastColor only (do NOT touch recents) — used when user changes picker or clicks a swatch but hasn't applied highlight yet
+async function setLastColorOnly(color) {
   if (!isValidHexColor(color)) return;
   const prefs = await loadPrefs();
   prefs.lastColor = color;
-  prefs.recents = prefs.recents || [];
-  prefs.recents = [color, ...prefs.recents.filter(c => c.toLowerCase() !== color.toLowerCase())].slice(0, MAX_RECENTS);
+  // keep recents untouched
   await savePrefs(prefs);
-  renderRecents(prefs.recents);
 }
 
 // ---------- UI renderers ----------
@@ -93,7 +91,8 @@ function renderRecents(recents) {
     d.style.cursor = 'pointer';
     d.addEventListener('click', async () => {
       colorInput.value = c;
-      await updateLastColor(c);
+      // user clicked a recent swatch — make it the current color but DO NOT modify recents again
+      await setLastColorOnly(c);
     });
     recentsContainer.appendChild(d);
   });
@@ -114,7 +113,8 @@ function renderVibgyor() {
     d.style.cursor = 'pointer';
     d.addEventListener('click', async () => {
       colorInput.value = c;
-      await updateLastColor(c);
+      // set lastColor only; do not add to recents until user applies highlight
+      await setLastColorOnly(c);
     });
     vibgyorContainer.appendChild(d);
   });
@@ -160,7 +160,7 @@ async function runOnActiveTab(func, args = []) {
   }
 }
 
-// ---------- injected helper functions (same safe ones) ----------
+// ---------- injected helper functions (unsafe-to-page logic is safe) ----------
 function injectedHighlightFunction(highlightColor) {
   const isHex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/;
   if (!isHex.test(highlightColor)) return { ok: false, err: 'invalid_color' };
@@ -227,7 +227,7 @@ document.getElementById('highlight').addEventListener('click', async () => {
     return;
   }
 
-  // success: add to recents
+  // success: add to recents (only now)
   await addToRecents(color);
   showMsg('Highlighted ✓', false);
 });
@@ -241,10 +241,10 @@ document.getElementById('clear').addEventListener('click', async () => {
   }
 });
 
-// when user changes color in picker, update prefs immediately
+// when user changes color in picker, persist it as lastColor only (do NOT add to recents)
 colorInput.addEventListener('input', async () => {
   const c = colorInput.value;
-  if (isValidHexColor(c)) await updateLastColor(c);
+  if (isValidHexColor(c)) await setLastColorOnly(c);
 });
 
 // ---------- init ----------
