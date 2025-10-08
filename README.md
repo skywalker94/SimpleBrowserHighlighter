@@ -4,6 +4,10 @@ A privacy-friendly Chrome extension that lets you **highlight text**, **persist 
 
 It remembers your **last-used color**, supports and stores **recently used colors**, and includes a **VIBGYOR-y color palette** for quick access — all while being **secure and sandboxed** (no external scripts, no data collection).
 
+#### 🌐 Webpage
+
+This is primarily a [user focused webpage](https://skywalker94.github.io/SimpleBrowserHighlighter/). It shows off the features at a glance and links the releases for easy downloads.
+
 ---
 
 ## 📸 Extension Image
