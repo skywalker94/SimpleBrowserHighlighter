@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simple Highlighter — Privacy-first Chrome extension</title>
+  <meta name="description" content="Simple Highlighter: highlight text in Chrome, persist highlights across reloads, keyboard shortcut, vibgyor palette, and recent colors. Privacy-first." />
+  <link rel="icon" href="images/logo_128.png">
+  <style>
+    :root{
+      --bg:#0f1724;
+      --card:#0b1220;
+      --accent:#ffd54a;
+      --muted:#9aa6b2;
+      --glass: rgba(255,255,255,0.03);
+      --success:#4caf50;
+      --radius:12px;
+      --max:980px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Liberation Mono", monospace;
+      --sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      --content-padding: 36px;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background: linear-gradient(180deg,#071025 0%, #071a2a 40%, #041226 100%);
+      color:#e6eef6;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      align-items:flex-start;            /* start at top so content can scroll naturally */
+      justify-content:center;
+      padding:var(--content-padding) 18px; /* comfortable top/bottom padding so things aren't flush to edges */
+      min-height:100vh;                  /* ensure body can grow and supports scrolling */
+      overflow-y:auto;                   /* allow vertical scroll when needed */
+    }
+
+    .wrap{width:100%;max-width:var(--max); margin:0 auto; padding-bottom:24px;}
+
+    header{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      margin-bottom:22px;
+    }
+    .logo{
+      width:72px;height:72px;border-radius:14px;background:var(--glass);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 6px 20px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+      flex:0 0 72px;
+    }
+    .logo img{width:48px;height:48px;display:block;}
+
+    .title{
+      display:flex;flex-direction:column;
+    }
+    .title h1{margin:0;font-size:20px;letter-spacing:-0.2px;}
+    .subtitle{margin-top:6px;color:var(--muted);font-size:13px;}
+
+    .hero{
+      display:grid;
+      grid-template-columns:1fr 340px;
+      gap:20px;
+      align-items:start;
+      margin-bottom:22px;
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: var(--radius);
+      padding:20px;
+      border:1px solid rgba(255,255,255,0.03);
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+    }
+
+    .lead{
+      font-size:15px;
+      color:#dff1ff;
+      line-height:1.5;
+      margin-bottom:14px;
+    }
+
+    .cta-row{display:flex;gap:10px;align-items:center;margin-top:8px;}
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:600;
+      background: linear-gradient(180deg,var(--accent), #f6be30); color:#071323; text-decoration:none;
+      box-shadow: 0 6px 18px rgba(6,20,30,0.45);
+    }
+    .btn.secondary{
+      background:transparent;color:#cfe7ff;border:1px solid rgba(255,255,255,0.04);
+      box-shadow:none;font-weight:600;padding:10px 12px;border-radius:10px;
+    }
+    .meta{font-size:13px;color:var(--muted);margin-top:10px;}
+
+    /* Features grid */
+    .features{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px;}
+    .feature{
+      background: rgba(255,255,255,0.02);
+      padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);
+    }
+    .feature h3{margin:0;font-size:14px;}
+    .feature p{margin:8px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
+
+    /* Right column preview */
+    .preview{
+      display:flex;flex-direction:column;gap:12px;
+    }
+    .phone{
+      width:100%;height:420px;border-radius:12px;background:linear-gradient(180deg,#071322,#06161e);padding:14px;border:1px solid rgba(255,255,255,0.02);
+      display:flex;flex-direction:column;gap:8px;
+    }
+    .screen{
+      flex:1;background:#02111a;border-radius:8px;padding:12px;color:#e9f6ff;overflow:auto;font-size:14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+    }
+    .screen p{margin:6px 0;}
+    .swatches{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+    .sw{width:28px;height:20px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);}
+
+    /* FAQ and install */
+    .two-col{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-top:18px}
+    .install ol{padding-left:18px;color:var(--muted);line-height:1.6}
+    .faq h3{margin:6px 0 6px;font-size:15px;color:#fff}
+    .faq p{color:var(--muted);line-height:1.6}
+
+    footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .small{font-size:12px;color:var(--muted)}
+
+    /* responsive */
+    @media (max-width:900px){
+      body{padding:22px 12px;}
+      .hero{grid-template-columns:1fr;}
+      .two-col{grid-template-columns:1fr;}
+      .phone{height:320px}
+      .features{grid-template-columns:1fr;}
+      .logo{width:56px;height:56px}
+      .title h1{font-size:18px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" role="main">
+    <header>
+      <div class="logo" aria-hidden="true">
+        <img src="images/logo_128.png" alt="Simple Highlighter logo" />
+      </div>
+      <div class="title">
+        <h1>Simple Highlighter</h1>
+        <div class="subtitle">A privacy-first Chrome extension for inline highlights & fast, persistent notes</div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="card">
+        <div class="lead">
+          Select text, press <strong>Ctrl+Shift+H</strong> (or use the popup), and mark important lines—your highlights persist across reloads and remain private on your device.
+        </div>
+
+        <div class="cta-row">
+          <a class="btn" href="https://github.com/yourname/your-repo/releases" target="_blank" rel="noopener noreferrer">
+            ⬇️ Download release
+          </a>
+          <a class="btn secondary" href="https://github.com/yourname/your-repo" target="_blank" rel="noopener noreferrer">
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="meta">No analytics. No cloud. Just local highlights that stay with your browser.</div>
+
+        <div class="features" aria-hidden="false">
+          <div class="feature">
+            <h3>Smart toggle</h3>
+            <p>Highlight a selection or select an already highlighted section to remove it. Partially highlighted selections are expanded and merged.</p>
+          </div>
+
+          <div class="feature">
+            <h3>Persistent by design</h3>
+            <p>Highlights are saved per page in your browser's local storage — they’re restored automatically when you return.</p>
+          </div>
+
+          <div class="feature">
+            <h3>Color recents & VIBGYOR</h3>
+            <p>Your last-used color is remembered; colors you actually used to mark text appear in recents. Quick palette for one-click access.</p>
+          </div>
+
+          <div class="feature">
+            <h3>Clear All (safe)</h3>
+            <p>Remove every highlight on the current page with a single action — confirmation required to prevent accidents.</p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="card preview" aria-label="Demo preview">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>Live preview</strong>
+          <span class="small">Shortcut: <code>Ctrl+Shift+H</code></span>
+        </div>
+
+        <div class="phone" role="img" aria-label="preview of highlighted page">
+          <div class="screen" id="preview-screen">
+            <p>Here’s a sample paragraph. Try imagining selecting any phrase and pressing <strong>Ctrl+Shift+H</strong>.</p>
+            <p><span style="background:#ffd54a;color:#071323;padding:2px 4px;border-radius:4px">This phrase is highlighted</span> and remains when the page reloads.</p>
+            <p>Use the color picker in the popup to pick other colors, and the recents will show the ones you actually applied.</p>
+            <div class="swatches" aria-hidden="true">
+              <div class="sw" style="background:#ff1744"></div>
+              <div class="sw" style="background:#ff9100"></div>
+              <div class="sw" style="background:#ffd600"></div>
+              <div class="sw" style="background:#76ff03"></div>
+              <div class="sw" style="background:#00e5ff"></div>
+              <div class="sw" style="background:#2979ff"></div>
+              <div class="sw" style="background:#d500f9"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="meta">Works on most regular web pages (HTTP/HTTPS). Not for chrome:// pages or web apps that isolate scripts (e.g., Google Docs).</div>
+      </aside>
+    </section>
+
+    <section class="two-col">
+      <div class="card install" aria-labelledby="install-heading">
+        <h2 id="install-heading" style="margin-top:0">Install in 3 steps</h2>
+        <ol>
+          <li><strong>Download</strong> the latest release ZIP from the Releases page and extract it.</li>
+          <li><strong>Open</strong> <code>chrome://extensions</code> in Chrome/Brave and enable <em>Developer mode</em>.</li>
+          <li><strong>Load unpacked</strong> and choose the extracted folder. The extension icon will appear in the toolbar.</li>
+        </ol>
+
+        <p style="margin-top:12px;color:var(--muted)">Tip: When updating, you can click <strong>Reload</strong> on the extension card in <code>chrome://extensions</code> after overwriting files in the original folder.</p>
+      </div>
+
+      <aside class="card faq" aria-labelledby="faq-heading">
+        <h2 id="faq-heading" style="margin-top:0">FAQ</h2>
+
+        <h3>Is my data sent to a server?</h3>
+        <p>No. All highlights and color preferences are stored locally in your browser's storage. Nothing is uploaded or tracked.</p>
+
+        <h3>How do I change the shortcut?</h3>
+        <p>Open <code>chrome://extensions/shortcuts</code> and set the shortcut for "Simple Highlighter" if <code>Ctrl+Shift+H</code> is taken.</p>
+
+        <h3>Why are some highlights not removable?</h3>
+        <p>If a page changes its text or layout drastically, an old highlight may be harder to match. Use the popup's Clear All to remove remaining highlights on a page.</p>
+
+        <h3>Does this work on PDF or Google Docs?</h3>
+        <p>Not reliably. The extension works best on normal web pages (HTTP/HTTPS). Document editors that sandbox content may prevent script interaction.</p>
+      </aside>
+    </section>
+
+    <footer>
+      <div>
+        <strong>Simple Highlighter</strong> — privacy focused • local-only highlights
+      </div>
+      <div>
+        <a class="small" href="https://github.com/yourname/your-repo" target="_blank" rel="noopener noreferrer">GitHub</a>
+        &nbsp;•&nbsp;
+        <a class="small" href="https://github.com/yourname/your-repo/releases" target="_blank" rel="noopener noreferrer">Releases</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
