@@ -147,61 +147,62 @@
       </div>
       <div class="title">
         <h1>Simple Highlighter</h1>
-        <div class="subtitle">A privacy-first Chrome extension for inline highlights & fast, persistent notes</div>
+        <div class="subtitle">A minimalistic browser extension for persistent highlights</div>
       </div>
     </header>
 
     <section class="hero">
       <div class="card">
         <div class="lead">
-          Select text, press <strong>Ctrl+Shift+H</strong> (or use the popup), and mark important lines—your highlights persist across reloads and remain private on your device.
+          Select text, press <strong>Ctrl+Shift+H</strong>, or use the 'Mark' button in the popup to and highlight important lines on any webpage you like.
         </div>
 
         <div class="cta-row">
-          <a class="btn" href="https://github.com/yourname/your-repo/releases" target="_blank" rel="noopener noreferrer">
-            ⬇️ Download release
+          <a class="btn" href="https://github.com/skywalker94/SimpleBrowserHighlighter/releases" target="_blank" rel="noopener noreferrer">
+            ⏬ Downloads
           </a>
-          <a class="btn secondary" href="https://github.com/yourname/your-repo" target="_blank" rel="noopener noreferrer">
-            View on GitHub
+          <a class="btn secondary" href="https://github.com/skywalker94/SimpleBrowserHighlighter" target="_blank" rel="noopener noreferrer">
+            🤖 Git-Hub
           </a>
         </div>
 
-        <div class="meta">No analytics. No cloud. Just local highlights that stay with your browser.</div>
+        <div class="meta">Highlight some content on webpages to quickly reference selected information, at a glance.</div>
 
         <div class="features" aria-hidden="false">
           <div class="feature">
-            <h3>Smart toggle</h3>
-            <p>Highlight a selection or select an already highlighted section to remove it. Partially highlighted selections are expanded and merged.</p>
+            <h3>🧠 Smart Toggle</h3>
+            <p>Highlight a selection or select an already marked section to remove it. Partially marked selections are expanded and merged.</p>
           </div>
 
           <div class="feature">
-            <h3>Persistent by design</h3>
-            <p>Highlights are saved per page in your browser's local storage — they’re restored automatically when you return.</p>
+            <h3>⌚ Persistent Highlights</h3>
+            <p>Highlights are saved per page in your browser's local storage — they're restored automatically when you return.</p>
           </div>
 
           <div class="feature">
-            <h3>Color recents & VIBGYOR</h3>
-            <p>Your last-used color is remembered; colors you actually used to mark text appear in recents. Quick palette for one-click access.</p>
+            <h3>🎨 Colour Flexibility</h3>
+            <p>Allows any colors for highlights. Your last few colours used are remembered. Quick palette for one-click access.</p>
           </div>
 
           <div class="feature">
-            <h3>Clear All (safe)</h3>
-            <p>Remove every highlight on the current page with a single action — confirmation required to prevent accidents.</p>
+            <h3>🪓 Safe Clear</h3>
+            <p>Supports removing every highlight on the current page with a single action — confirmation required to prevent accidents.</p>
           </div>
         </div>
       </div>
 
       <aside class="card preview" aria-label="Demo preview">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <strong>Live preview</strong>
+          <strong>Usage</strong>
           <span class="small">Shortcut: <code>Ctrl+Shift+H</code></span>
         </div>
 
         <div class="phone" role="img" aria-label="preview of highlighted page">
           <div class="screen" id="preview-screen">
-            <p>Here’s a sample paragraph. Try imagining selecting any phrase and pressing <strong>Ctrl+Shift+H</strong>.</p>
-            <p><span style="background:#ffd54a;color:#071323;padding:2px 4px;border-radius:4px">This phrase is highlighted</span> and remains when the page reloads.</p>
-            <p>Use the color picker in the popup to pick other colors, and the recents will show the ones you actually applied.</p>
+            <p>Here is a sample paragraph shown below. Imagine selecting any phrase and pressing <strong>Ctrl+Shift+H</strong>.</p><br>
+            <p><span style="background:#ffd54a;color:#071323;padding:2px 4px;border-radius:4px">The selected phrase is highlighted</span> and remains when the page reloads.</p><br>
+            <p>You can expand the selection or remove it as well, similar to how bold / italics text modifiers work.</p><br>
+            <p>Use the quick palette and recents to quickly reapply your favorite highlights colours.</p>
             <div class="swatches" aria-hidden="true">
               <div class="sw" style="background:#ff1744"></div>
               <div class="sw" style="background:#ff9100"></div>
@@ -214,47 +215,53 @@
           </div>
         </div>
 
-        <div class="meta">Works on most regular web pages (HTTP/HTTPS). Not for chrome:// pages or web apps that isolate scripts (e.g., Google Docs).</div>
+        <div class="meta">Should work on most HTTP / HTTPS webpages, unlike <code>chrome://</code> pages or web apps that isolate scripts like <code>https://docs.google.com/</code>.</div>
       </aside>
     </section>
 
     <section class="two-col">
       <div class="card install" aria-labelledby="install-heading">
-        <h2 id="install-heading" style="margin-top:0">Install in 3 steps</h2>
+        <h2 id="install-heading" style="margin-top:0">Setup Guide</h2>
         <ol>
-          <li><strong>Download</strong> the latest release ZIP from the Releases page and extract it.</li>
-          <li><strong>Open</strong> <code>chrome://extensions</code> in Chrome/Brave and enable <em>Developer mode</em>.</li>
-          <li><strong>Load unpacked</strong> and choose the extracted folder. The extension icon will appear in the toolbar.</li>
+          <li style="margin-top:2px">From the releases page of the GitHub repository, '<strong>Downloads</strong>' linked above, download the ZIP <code>(.zip)</code> file of the latest release.</li>
+
+          <li style="margin-top:2px">Extract the files into your folder of choice. This will become the location where you host the chrome extension.</li>
+
+          <li style="margin-top:2px">Navigate to <code>chrome://extensions/</code> in the browser. You can also find this by clicking the menu button and looking for <strong>Manage Extensions</strong>.</li>
+          
+          <li style="margin-top:2px">Enable <strong>Developer mode</strong>, if you have not done this before. It is usually found in the top right corner.</li>
+
+          <li style="margin-top:2px">Click <strong>Load unpacked</strong> and select the folder you extracted the ZIP files into in step two. The chosen folder should contain manifest.json.</li>
         </ol>
 
-        <p style="margin-top:12px;color:var(--muted)">Tip: When updating, you can click <strong>Reload</strong> on the extension card in <code>chrome://extensions</code> after overwriting files in the original folder.</p>
+        <h2 id="install-heading" style="margin-top:0">Updates</h2>
+        <p style="margin-top:12px;color:var(--muted)">
+            Fetch a the new version from the '<strong>Downloads</strong>' above. Replace the existing files in the folder that hosts your extension. Click the <strong>reload icon</strong> on the extension card in <code>chrome://extensions/</code>.
+        </p>
       </div>
 
       <aside class="card faq" aria-labelledby="faq-heading">
         <h2 id="faq-heading" style="margin-top:0">FAQ</h2>
 
         <h3>Is my data sent to a server?</h3>
-        <p>No. All highlights and color preferences are stored locally in your browser's storage. Nothing is uploaded or tracked.</p>
+        <p>All highlights and color preferences are stored locally in your browser's storage. Nothing is tracked.</p>
 
         <h3>How do I change the shortcut?</h3>
         <p>Open <code>chrome://extensions/shortcuts</code> and set the shortcut for "Simple Highlighter" if <code>Ctrl+Shift+H</code> is taken.</p>
 
-        <h3>Why are some highlights not removable?</h3>
-        <p>If a page changes its text or layout drastically, an old highlight may be harder to match. Use the popup's Clear All to remove remaining highlights on a page.</p>
-
-        <h3>Does this work on PDF or Google Docs?</h3>
-        <p>Not reliably. The extension works best on normal web pages (HTTP/HTTPS). Document editors that sandbox content may prevent script interaction.</p>
+        <h3>Will changes to the base page affect my highlights?</h3>
+        <p>It is possible. Since it relies on the page's structure and content, any significant changes may impact highlight behavior.</p>
       </aside>
     </section>
 
     <footer>
       <div>
-        <strong>Simple Highlighter</strong> — privacy focused • local-only highlights
+        <strong>Simple Highlighter</strong> — quickly track required content • privacy focused
       </div>
       <div>
         <a class="small" href="https://github.com/yourname/your-repo" target="_blank" rel="noopener noreferrer">GitHub</a>
         &nbsp;•&nbsp;
-        <a class="small" href="https://github.com/yourname/your-repo/releases" target="_blank" rel="noopener noreferrer">Releases</a>
+        <a class="small" href="https://github.com/skywalker94/SimpleBrowserHighlighter/releases" target="_blank" rel="noopener noreferrer">Releases</a>
       </div>
     </footer>
   </div>
